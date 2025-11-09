@@ -5,7 +5,6 @@ export type ThemedViewProps = ViewProps & {
 };
 
 export function ThemedView({ className, ...otherProps }: ThemedViewProps) {
-  // Default container background respects light/dark using Tailwind utilities
-  const defaultClasses = 'bg-background dark:bg-background-dark';
-  return <View className={[defaultClasses, className].filter(Boolean).join(' ')} {...otherProps} />;
+  // const defaultClasses = 'bg-background';
+  return <View className={[className].filter(Boolean).join(' ')} {...otherProps} />;
 }

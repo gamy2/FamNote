@@ -6,12 +6,12 @@ export type ThemedTextProps = TextProps & {
 };
 
 export function ThemedText({ type = 'default', className, ...rest }: ThemedTextProps) {
-  const base = 'text-base leading-6 text-zinc-900 dark:text-zinc-100';
+  const base = 'text-base leading-6 text-text';
   const variants: Record<NonNullable<ThemedTextProps['type']>, string> = {
     default: base,
     defaultSemiBold: base + ' font-semibold',
-    title: 'text-3xl font-bold leading-8 text-zinc-900 dark:text-zinc-100',
-    subtitle: 'text-xl font-bold text-zinc-900 dark:text-zinc-100',
+    title: 'text-3xl font-bold leading-8 text-text',
+    subtitle: 'text-xl font-bold text-text',
     link: 'text-base leading-[30px] text-primary',
   };
 

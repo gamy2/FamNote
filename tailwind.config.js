@@ -8,27 +8,12 @@ module.exports = {
   theme: {
     extend: {
       colors:{
-        primary: '#B9271B',
-        background: {
-          DEFAULT: '#ffffff',
-          dark: '#151718'
-        },
-        text: {
-          DEFAULT: '#11181C',
-          dark: '#ECEDEE'
-        },
-        muted: {
-          DEFAULT: '#687076',
-          dark: '#9BA1A6'
-        },
-        card: {
-          DEFAULT: '#ffffff',
-          dark: '#1D1F20'
-        },
-        border: {
-          DEFAULT: '#E5E7EB',
-          dark: '#2A2D2E'
-        }
+        primary: '#0F9E99',
+        background: '#EFE9E0',
+        text: '#003B38',
+        muted: '#687076',
+        card: '#ffffff',
+        border: '#E5E7EB'
       }
     },
   },

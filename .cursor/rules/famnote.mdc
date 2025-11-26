@@ -1,0 +1,51 @@
+---
+alwaysApply: false
+---
+- Use environment variables to store Supabase URL and API keys securely.
+- Implement real-time subscriptions for data updates.
+- Use Supabase's built-in authentication for user management.
+- Optimize queries by selecting only necessary fields.
+
+---
+name: react-native-best-practices.mdc
+description: Best practices for React Native development
+globs: **/*.{ts,tsx,js,jsx}
+---
+
+- Use functional components and hooks for cleaner and more maintainable code.
+- Optimize performance by using `React.memo` and `useCallback`.
+- Handle platform-specific code using `Platform` module.
+- Test on both iOS and Android devices to ensure consistent behavior.
+
+---
+name: typescript-best-practices.mdc 
+description: TypeScript coding standards and type safety guidelines
+globs: **/*.{ts,tsx}
+---
+
+- Use strict null checks to avoid runtime errors.
+- Prefer interface over type for defining object shapes.
+- Utilize type guards and assertions for better type safety.
+- Implement proper type inference to reduce redundancy.
+
+---
+name: tailwindcss-best-practices.mdc
+description: Best practices for using Tailwind CSS
+globs: **/*.{ts,tsx,css}
+---
+
+- Use Tailwind's utility classes for rapid styling and consistency.
+- Create custom utility classes for frequently used styles.
+- Leverage responsive design features to ensure mobile compatibility.
+- Organize styles in a way that promotes reusability and maintainability.
+
+---
+name: i18next-best-practices.mdc
+description: Best practices for internationalization with i18next
+globs: **/*.{ts,tsx,js,jsx}
+---
+
+- Use namespaces to organize translations for better maintainability.
+- Implement fallback languages to ensure a smooth user experience.
+- Use the `useTranslation` hook for easy access to translation functions.
+- Regularly update translation files to keep content current.

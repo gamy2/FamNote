@@ -42,3 +42,13 @@ app-example
 # generated native folders
 /ios
 /android
+
+
+# info
+supabase_schema.sql
+supabase_storage.sql
+# PRD.md
+database_design.md
+firebase_supabase_integration.md
+task.md
+implementation_plan.md

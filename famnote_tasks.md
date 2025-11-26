@@ -18,15 +18,15 @@
 - [x] Set up project folder structure (app/, src/, assets/)
 
 ### Day 2: Firebase Setup
-- [ ] Create Firebase project in console
-- [ ] Enable Email/Password authentication
-- [ ] Enable Google Sign-In authentication
-- [ ] Enable Apple Sign-In (iOS)
-- [ ] Download `google-services.json` (Android)
-- [ ] Download `GoogleService-Info.plist` (iOS)
-- [ ] Install Firebase SDK (`firebase` package)
-- [ ] Create Firebase configuration file (`src/services/firebase.ts`)
-- [ ] Test Firebase connection
+- [x] Create Firebase project in console
+- [x] Enable Email/Password authentication
+- [x] Enable Google Sign-In authentication
+- [x] Enable Apple Sign-In (iOS)
+- [x] Download `google-services.json` (Android)
+- [x] Download `GoogleService-Info.plist` (iOS)
+- [x] Install Firebase SDK (`firebase` package)
+- [x] Create Firebase configuration file (`src/services/firebase.ts`)
+- [x] Test Firebase connection
 
 ### Day 3: Supabase Setup
 - [ ] Create Supabase project

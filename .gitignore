@@ -43,6 +43,9 @@ app-example
 /ios
 /android
 
+# Firebase config files (platform-specific)
+google-services.json
+GoogleService-Info.plist
 
 # info
 supabase_schema.sql

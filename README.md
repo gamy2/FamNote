@@ -1,50 +1,121 @@
-# Welcome to your Expo app 👋
+# FamNote - Family Note Taker Mobile App 📝
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native mobile application that enables families to create, share, and manage notes collaboratively in a single shared space.
 
-## Get started
+## 📱 Platform
 
-1. Install dependencies
+- **Framework:** React Native with Expo (SDK 54+)
+- **Language:** TypeScript
+- **Target Devices:** iOS & Android
 
+## 🚀 Tech Stack
+
+### Frontend
+- React Native with Expo
+- TypeScript
+- React Navigation v7
+- React Native Paper (UI Components)
+- NativeWind (Tailwind CSS for React Native)
+- Expo Router (File-based routing)
+
+### Backend Services
+- **Authentication:** Firebase Authentication
+  - Email/Password
+  - Google Sign-In
+  - Apple Sign-In (iOS)
+- **Database:** Supabase (PostgreSQL)
+- **Storage:** Supabase Storage
+- **Real-time:** Supabase Realtime subscriptions
+
+## 🎯 Key Features
+
+- Family-based note sharing system
+- User authentication via Firebase
+- Real-time note synchronization
+- Image attachments for notes
+- Multiple note types (general, reminder, shopping, todo)
+- Emoji reactions and categorization
+- Invite code system for family joining
+
+## 📦 Installation
+
+1. Install dependencies:
    ```bash
-   npm install
+   yarn install
    ```
 
-2. Start the app
+2. Set up environment variables:
+   - Copy `.env.example` to `.env`
+   - Add your Firebase and Supabase credentials
 
+3. Start the development server:
    ```bash
-   npx expo start
+   yarn start
    ```
 
-In the output, you'll find options to open the app in a
+## 🏗️ Project Structure
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+FamNote/
+├── app/                    # Expo Router screens
+│   ├── (auth)/            # Authentication screens
+│   ├── (onboarding)/      # Onboarding screens
+│   ├── (tabs)/            # Main app tabs
+│   └── notes/             # Note management screens
+├── src/
+│   ├── components/        # Reusable components
+│   ├── contexts/          # React contexts
+│   ├── services/          # API services
+│   ├── hooks/             # Custom hooks
+│   ├── types/             # TypeScript types
+│   ├── utils/             # Utility functions
+│   └── theme/             # Theme configuration
+├── assets/                # Images, fonts, icons
+└── ...config files
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 🛠️ Available Scripts
 
-## Learn more
+- `yarn start` - Start Expo development server
+- `yarn android` - Run on Android emulator
+- `yarn ios` - Run on iOS simulator
+- `yarn web` - Run on web browser
+- `yarn lint` - Run ESLint
 
-To learn more about developing your project with Expo, look at the following resources:
+## 📚 Documentation
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- [Product Requirements Document (PRD)](./PRD.md)
+- [Database Design](./database_design.md)
+- [Firebase & Supabase Integration](./firebase_supabase_integration.md)
+- [Development Tasks](./famnote_tasks.md)
 
-## Join the community
+## 🔐 Environment Setup
 
-Join our community of developers creating universal apps.
+Required environment variables:
+```env
+EXPO_PUBLIC_FIREBASE_API_KEY=
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+EXPO_PUBLIC_FIREBASE_APP_ID=
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+EXPO_PUBLIC_SUPABASE_URL=
+EXPO_PUBLIC_SUPABASE_ANON_KEY=
+```
+
+## 📖 Learn More
+
+- [Expo Documentation](https://docs.expo.dev/)
+- [React Native Documentation](https://reactnative.dev/)
+- [Firebase Documentation](https://firebase.google.com/docs)
+- [Supabase Documentation](https://supabase.com/docs)
+
+## 📄 License
+
+Private - All rights reserved
+
+## 👥 Development Status
+
+**Current Phase:** Week 1 - Project Setup & Environment Configuration  
+**Last Updated:** November 26, 2025

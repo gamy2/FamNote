@@ -10,12 +10,12 @@
 **Goal:** Set up development environment, initialize project, and configure backend services
 
 ### Day 1: Project Initialization
-- [ ] Install Expo CLI globally
-- [ ] Create new Expo project with TypeScript template
-- [ ] Set up Git repository and initial commit
-- [ ] Configure `.gitignore` for React Native/Expo
-- [ ] Install core dependencies (React Navigation, React Native Paper)
-- [ ] Set up project folder structure (app/, src/, assets/)
+- [x] Install Expo CLI globally
+- [x] Create new Expo project with TypeScript template
+- [x] Set up Git repository and initial commit
+- [x] Configure `.gitignore` for React Native/Expo
+- [x] Install core dependencies (React Navigation, React Native Paper)
+- [x] Set up project folder structure (app/, src/, assets/)
 
 ### Day 2: Firebase Setup
 - [ ] Create Firebase project in console

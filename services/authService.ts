@@ -10,6 +10,7 @@ import {
 } from 'firebase/auth';
 import { Platform } from 'react-native';
 import { auth } from './firebase';
+import { supabase } from './supabase';
 
 /**
  * Authentication Service
@@ -36,8 +37,13 @@ export const signInWithEmail = async (
 ): Promise<AuthResult> => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const firebaseUser = userCredential.user;
+
+    // Ensure user profile exists in Supabase (in case it wasn't created during signup)
+    await createUserProfile(firebaseUser);
+
     return {
-      user: userCredential.user,
+      user: firebaseUser,
       error: null,
     };
   } catch (error: any) {
@@ -65,6 +71,43 @@ export const signInWithEmail = async (
 };
 
 /**
+ * Create or update user profile in Supabase
+ */
+const createUserProfile = async (firebaseUser: User): Promise<{ error: string | null }> => {
+  try {
+    // Check if user profile already exists
+    const { data: existingUser } = await supabase
+      .from('user')
+      .select('id')
+      .eq('id', firebaseUser.uid)
+      .single();
+
+    // If user doesn't exist, create profile
+    if (!existingUser) {
+      const { error } = await supabase
+        .from('user')
+        .insert({
+          id: firebaseUser.uid,
+          email: firebaseUser.email || '',
+          username: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+          family_id: null,
+          image: firebaseUser.photoURL || null,
+        });
+
+      if (error) {
+        console.error('Error creating user profile:', error);
+        return { error: error.message };
+      }
+    }
+
+    return { error: null };
+  } catch (error: any) {
+    console.error('Error in createUserProfile:', error);
+    return { error: error.message || 'Failed to create user profile' };
+  }
+};
+
+/**
  * Sign up with email and password
  */
 export const signUpWithEmail = async (
@@ -73,8 +116,17 @@ export const signUpWithEmail = async (
 ): Promise<AuthResult> => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const firebaseUser = userCredential.user;
+
+    // Create user profile in Supabase
+    const { error: profileError } = await createUserProfile(firebaseUser);
+    if (profileError) {
+      console.error('Failed to create user profile:', profileError);
+      // Don't fail signup if profile creation fails, but log it
+    }
+
     return {
-      user: userCredential.user,
+      user: firebaseUser,
       error: null,
     };
   } catch (error: any) {
@@ -115,6 +167,8 @@ export const signInWithGoogle = async (): Promise<AuthResult> => {
       // Check if we're returning from a redirect
       const result = await getRedirectResult(auth);
       if (result) {
+        // Create user profile in Supabase
+        await createUserProfile(result.user);
         return {
           user: result.user,
           error: null,

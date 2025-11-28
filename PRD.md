@@ -1,76 +1,170 @@
 # Product Requirements Document (PRD)
-## Family Note Taker Mobile App
+## Family Note Taker Mobile App - FamNote
 
 **Version:** 1.0  
-**Date:** November 26, 2025  
+**Date:** November 28, 2025  
 **Platform:** React Native (Expo)  
-**Target Devices:** iOS & Android
+**Target Devices:** iOS & Android  
+**Project Status:** In Development
 
 ---
 
 ## 1. Executive Summary
 
 ### 1.1 Product Overview
-Family Note Taker is a mobile application that enables families to create, share, and manage notes collaboratively in a single shared space. Each family has a private workspace where all members can contribute notes, share updates, and stay connected.
+FamNote is a mobile application that enables families to create, share, and manage notes collaboratively in a single shared space. Each family has a private workspace where all members can contribute notes, share updates, and stay connected.
 
 ### 1.2 Key Features
 - Family-based note sharing system
 - User authentication via Firebase
 - Real-time note synchronization
 - Image attachments for notes
-- Multiple note types (general, reminder, shopping, etc.)
+- Multiple note categories (Reminder, Celebration, Request, Memory, Update)
 - Emoji reactions and categorization
 - Invite code system for family joining
+- Multi-language support (English, Arabic)
 
 ---
 
-## 2. Technical Stack
+## 2. Technical Stack (Current Implementation)
 
 ### 2.1 Frontend
-- **Framework:** React Native with Expo (SDK 50+)
+- **Framework:** React Native with Expo SDK 54
 - **Language:** TypeScript
-- **State Management:** React Context API or Zustand
-- **Navigation:** React Navigation v6
-- **UI Components:** React Native Paper or NativeBase
-- **Icons:** @expo/vector-icons
-- **Image Handling:** expo-image-picker, expo-image-manipulator
+- **Routing:** Expo Router 6 (file-based routing)
+- **Styling:** NativeWind 4 (Tailwind CSS for React Native)
+- **State Management:** React Context API (to be implemented)
+- **Animations:** React Native Reanimated 4
+- **Icons:** @expo/vector-icons (MaterialIcons, MaterialCommunityIcons, AntDesign)
+- **Image Handling:** expo-image, expo-image-picker, expo-image-manipulator
+- **Internationalization:** i18next, react-i18next
 
 ### 2.2 Backend Services
-- **Authentication:** Firebase Authentication
+- **Authentication:** Firebase Authentication (v12.6.0)
   - Email/Password
   - Google Sign-In
   - Apple Sign-In (iOS)
-- **Database:** Supabase (PostgreSQL)
+- **Database:** Supabase (PostgreSQL) v2.39.0
 - **Storage:** Supabase Storage
 - **Real-time:** Supabase Realtime subscriptions
 
-### 2.3 Required Expo Packages
+### 2.3 Current Dependencies
 ```json
 {
   "dependencies": {
-    "expo": "~50.0.0",
-    "expo-router": "^3.4.0",
-    "react-native": "0.73.0",
-    "react-native-paper": "^5.12.0",
-    "@react-navigation/native": "^6.1.9",
-    "@react-navigation/stack": "^6.3.20",
+    "expo": "~54.0.20",
+    "expo-router": "~6.0.13",
+    "react-native": "0.81.5",
+    "react": "19.1.0",
+    "nativewind": "^4.2.1",
+    "tailwindcss": "^3.4.18",
     "@supabase/supabase-js": "^2.39.0",
-    "firebase": "^10.7.0",
-    "expo-image-picker": "~14.7.1",
-    "expo-clipboard": "~5.0.1",
-    "expo-sharing": "~11.7.0",
-    "react-native-safe-area-context": "4.8.2",
-    "react-native-screens": "~3.29.0",
-    "@react-native-async-storage/async-storage": "1.21.0"
+    "firebase": "^12.6.0",
+    "expo-image-picker": "^17.0.8",
+    "expo-image-manipulator": "^14.0.7",
+    "expo-linear-gradient": "^15.0.7",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "react-native-reanimated": "~4.1.1",
+    "i18next": "^25.6.0",
+    "react-i18next": "^16.2.4"
   }
 }
 ```
 
 ---
 
-## 3. Database Schema
+## 3. Design System
 
-### 3.1 Tables
+### 3.1 Color Palette
+```javascript
+// tailwind.config.js
+colors: {
+  primary: '#0F9E99',      // Teal - primary actions, buttons
+  background: '#EFE9E0',   // Beige - app background
+  text: '#003B38',         // Dark teal - primary text
+  muted: '#687076',        // Gray - secondary text
+  card: '#ffffff',         // White - card backgrounds
+  border: '#E5E7EB'        // Light gray - borders
+}
+```
+
+### 3.2 Note Categories
+```javascript
+[
+  { id: 'reminder', label: 'Reminder', textColor: '#EC4D6B', bgColor: '#FEE7EF' },
+  { id: 'celebration', label: 'Celebration', textColor: '#47C2BE', bgColor: '#E4F7F6' },
+  { id: 'request', label: 'Request', textColor: '#F9BE1A', bgColor: '#FFF7DE' },
+  { id: 'memory', label: 'Memory', textColor: '#7A6DAE', bgColor: '#F2F0FA' },
+  { id: 'update', label: 'Update', textColor: '#56C6B2', bgColor: '#E9F7F6' }
+]
+```
+
+### 3.3 Typography
+- **Custom Components:** `ThemedText`, `ThemedView`
+- **Font Families:** System fonts (SF Pro on iOS, Roboto on Android)
+- **Text Types:** default, title, subtitle, defaultSemiBold, link
+
+---
+
+## 4. Current Project Structure
+
+```
+FamNote/
+├── app/                              # Expo Router screens
+│   ├── (tabs)/                       # Tab navigation
+│   │   ├── _layout.tsx              # Tab navigator setup ✅
+│   │   ├── index.tsx                # Notes feed screen ✅
+│   │   ├── explore.tsx              # Family info screen ✅
+│   │   └── settings.tsx             # Settings screen ✅
+│   ├── modal.tsx                     # Create note modal ✅
+│   └── _layout.tsx                   # Root layout ✅
+├── src/
+│   └── services/
+│       ├── firebase.ts               # Firebase initialization ✅
+│       └── supabase.ts               # Supabase client ✅
+├── components/
+│   ├── themed-text.tsx               # Themed text component ✅
+│   ├── themed-view.tsx               # Themed view component ✅
+│   ├── haptic-tab.tsx                # Tab with haptic feedback ✅
+│   ├── parallax-scroll-view.tsx      # Scroll view with parallax ✅
+│   └── ui/                           # UI components
+│       ├── collapsible.tsx           ✅
+│       ├── icon-symbol.tsx           ✅
+│       └── icon-symbol.ios.tsx       ✅
+├── constants/
+│   └── theme.ts                      # Theme constants ✅
+├── hooks/
+│   ├── use-color-scheme.ts           # Color scheme hook ✅
+│   └── use-theme-color.ts            # Theme color hook ✅
+├── i18n/
+│   ├── index.ts                      # i18n configuration ✅
+│   └── translations/
+│       ├── en.json                   # English translations ✅
+│       └── ar.json                   # Arabic translations ✅
+├── utils/
+│   ├── supabase.ts                   # Supabase utilities ✅
+│   ├── supabase-example.ts           # Usage examples ✅
+│   └── lang-switcher.ts              # Language switcher ✅
+├── docs/
+│   └── FIREBASE_SETUP.md             # Firebase setup guide ✅
+├── .env.example                      # Environment variables template ✅
+├── app.config.js                     # Expo configuration ✅
+├── tailwind.config.js                # Tailwind configuration ✅
+├── babel.config.js                   # Babel configuration ✅
+├── metro.config.js                   # Metro bundler config ✅
+└── tsconfig.json                     # TypeScript configuration ✅
+```
+
+**Legend:**
+- ✅ = Already implemented
+- 🚧 = Needs implementation
+- 📝 = Needs updates
+
+---
+
+## 5. Database Schema
+
+### 5.1 Tables
 
 #### **families**
 ```sql
@@ -106,14 +200,14 @@ Family Note Taker is a mobile application that enables families to create, share
   user_id: UUID (FK -> users.id),
   text_content: TEXT,
   image_url: TEXT,
-  type: VARCHAR(50), -- 'general', 'reminder', 'shopping', 'todo'
+  category: VARCHAR(50), -- 'reminder', 'celebration', 'request', 'memory', 'update'
   emoji: VARCHAR(10),
   created_at: TIMESTAMP,
   updated_at: TIMESTAMP
 }
 ```
 
-### 3.2 Relationships
+### 5.2 Relationships
 - User **belongs to** 0 or 1 Family
 - Family **has many** Users (1+)
 - Family **has many** Notes (0+)
@@ -121,476 +215,393 @@ Family Note Taker is a mobile application that enables families to create, share
 - Note **belongs to** 1 Family
 - Note **belongs to** 1 User (author)
 
-### 3.3 Storage Buckets
+### 5.3 Storage Buckets
 - `user-avatars/` - User profile images (public)
 - `note-images/` - Note attachment images (private, family-scoped)
 
 ---
 
-## 4. User Stories & Features
+## 6. Implementation Plan
 
-### 4.1 Authentication & Onboarding
+### Phase 1: Foundation (Week 1) ✅ COMPLETED
+- [x] Project setup with Expo
+- [x] NativeWind/Tailwind configuration
+- [x] Firebase service initialization
+- [x] Supabase service initialization
+- [x] Environment variables setup
+- [x] Basic routing structure
+- [x] Theme system with custom colors
+- [x] i18n setup (English, Arabic)
 
-**US-001: User Registration**
-- As a new user, I want to sign up with email/password or social login
-- Acceptance Criteria:
-  - User can register with email and password
-  - User can sign up with Google
-  - User can sign up with Apple (iOS only)
-  - Email verification sent after registration
-  - User profile created in Supabase with Firebase UID
+### Phase 2: Authentication (Week 2) 🚧 IN PROGRESS
+**Priority Tasks:**
+1. Create authentication context (`src/contexts/AuthContext.tsx`)
+2. Implement auth service functions (`src/services/authService.ts`)
+3. Build authentication screens:
+   - Login screen (`app/(auth)/login.tsx`)
+   - Signup screen (`app/(auth)/signup.tsx`)
+   - Forgot password screen (`app/(auth)/forgot-password.tsx`)
+4. Implement Firebase + Supabase integration:
+   - Create user profile in Supabase after Firebase signup
+   - Sync Firebase UID with Supabase user ID
+5. Add session persistence with AsyncStorage
+6. Add social login (Google, Apple)
 
-**US-002: User Login**
-- As a returning user, I want to log in to access my family notes
-- Acceptance Criteria:
-  - User can log in with email/password
-  - User can log in with social providers
-  - Session persists across app restarts
-  - Automatic redirect to family screen if user has family
-  - Redirect to onboarding if user has no family
+### Phase 3: Family Management (Week 3) 📝 PENDING
+**Priority Tasks:**
+1. Create family context (`src/contexts/FamilyContext.tsx`)
+2. Implement family service (`src/services/familyService.ts`)
+3. Build onboarding screens:
+   - Family onboarding welcome (`app/(onboarding)/index.tsx`)
+   - Create family screen (`app/(onboarding)/create.tsx`)
+   - Join family screen (`app/(onboarding)/join.tsx`)
+4. Implement invite code generation
+5. Update Family tab (`app/(tabs)/explore.tsx`) with:
+   - Family details display
+   - Member list
+   - Invite code sharing
+   - Leave/Delete family actions
 
-### 4.2 Family Management
+### Phase 4: Notes CRUD (Week 4) 🚧 IN PROGRESS
+**Current Status:**
+- [x] Create note modal UI (`app/modal.tsx`)
+- [x] Emoji picker with animations
+- [x] Category selection
+- [x] Text input
+- [ ] Image picker integration
+- [ ] Note service implementation (`src/services/noteService.ts`)
+- [ ] Save note to Supabase
+- [ ] Update Notes feed (`app/(tabs)/index.tsx`)
 
-**US-003: Create Family**
-- As a user without a family, I want to create a new family
-- Acceptance Criteria:
-  - User can create family with name and optional description
-  - Unique invite code generated automatically (8 characters)
-  - User becomes family creator
-  - User's family_id updated in database
-  - Redirect to family home screen
+**Remaining Tasks:**
+1. Implement note service functions
+2. Integrate image picker and upload
+3. Connect modal to Supabase
+4. Build NoteCard component (`components/NoteCard.tsx`)
+5. Implement real-time subscriptions
+6. Add edit/delete functionality
+7. Add pull-to-refresh
+8. Add search and filter
 
-**US-004: Join Family**
-- As a user without a family, I want to join an existing family using invite code
-- Acceptance Criteria:
-  - User can enter 8-character invite code
-  - Validation shows if code is invalid
-  - User's family_id updated upon successful join
-  - User sees all existing family notes
-  - Cannot join if already in a family
+### Phase 5: Storage & Images (Week 5) 📝 PENDING
+1. Create storage service (`src/services/storageService.ts`)
+2. Implement image upload to Supabase Storage
+3. Implement image compression/resizing
+4. Add user avatar upload
+5. Add note image attachments
+6. Implement image viewing (full-screen)
 
-**US-005: View Family Info**
-- As a family member, I want to see family details and members
-- Acceptance Criteria:
-  - Display family name, description
-  - Show all family members with avatars
-  - Display invite code with copy button
-  - Show member count
-  - Show family creation date
+### Phase 6: Real-time Features (Week 6) 📝 PENDING
+1. Create real-time hook (`src/hooks/useRealtime.ts`)
+2. Implement Supabase real-time subscriptions
+3. Add real-time note updates
+4. Add real-time member updates
+5. Add optimistic UI updates
 
-**US-006: Leave Family**
-- As a family member, I want to leave my current family
-- Acceptance Criteria:
-  - Confirmation dialog before leaving
-  - User's family_id set to null
-  - User's notes remain in family (orphaned to family)
-  - Redirect to onboarding screen
-  - If creator leaves, oldest member becomes new creator
-
-**US-007: Delete Family (Creator Only)**
-- As a family creator, I want to delete the entire family
-- Acceptance Criteria:
-  - Only creator can delete family
-  - Confirmation dialog with warning
-  - All family notes deleted (CASCADE)
-  - All members' family_id set to null
-  - All members redirected to onboarding
-
-### 4.3 Note Management
-
-**US-008: Create Note**
-- As a family member, I want to create a text note
-- Acceptance Criteria:
-  - Text input with multiline support
-  - Optional image attachment (camera or gallery)
-  - Select note type (general, reminder, shopping, todo)
-  - Optional emoji picker
-  - Save button creates note
-  - Note immediately visible to all family members
-
-**US-009: View Notes Feed**
-- As a family member, I want to see all family notes in chronological order
-- Acceptance Criteria:
-  - Notes displayed newest first
-  - Show author name and avatar
-  - Show note content, image, emoji, type
-  - Show timestamp (relative: "2 hours ago")
-  - Pull-to-refresh functionality
-  - Infinite scroll/pagination for large lists
-
-**US-010: Edit Own Note**
-- As a note author, I want to edit my own notes
-- Acceptance Criteria:
-  - Only author can edit their notes
-  - Edit icon visible on user's own notes
-  - Can modify text, image, emoji, type
-  - "Edited" label shown with edit timestamp
-  - Changes reflected in real-time
-
-**US-011: Delete Own Note**
-- As a note author, I want to delete my own notes
-- Acceptance Criteria:
-  - Only author can delete their notes
-  - Delete icon visible on user's own notes
-  - Confirmation dialog before deletion
-  - Note removed from database and storage
-  - Real-time removal from all clients
-
-**US-012: Filter Notes by Type**
-- As a family member, I want to filter notes by type
-- Acceptance Criteria:
-  - Filter chips for each note type
-  - "All" option shows unfiltered notes
-  - Filtered view shows only selected type
-  - Filter state persists during session
-
-**US-013: Search Notes**
-- As a family member, I want to search notes by text content
-- Acceptance Criteria:
-  - Search bar at top of notes feed
-  - Real-time filtering as user types
-  - Search across note text content
-  - Clear search button
-  - No results message when appropriate
-
-### 4.4 User Profile
-
-**US-014: View/Edit Profile**
-- As a user, I want to manage my profile information
-- Acceptance Criteria:
-  - View username, email, profile picture
-  - Edit username
-  - Upload/change profile picture
-  - Display family membership status
-  - Show account creation date
-
-**US-015: Logout**
-- As a user, I want to securely log out
-- Acceptance Criteria:
-  - Logout button in profile/settings
-  - Clears Firebase session
-  - Clears local storage/cache
-  - Redirects to login screen
-  - Confirmation dialog optional
+### Phase 7: Polish & Testing (Week 7-8) 📝 PENDING
+1. Error handling and loading states
+2. Form validation
+3. Offline support (basic)
+4. Performance optimization
+5. Testing (unit, integration)
+6. Bug fixes
+7. UI/UX refinements
 
 ---
 
-## 5. Screen Specifications
+## 7. User Stories & Implementation Details
 
-### 5.1 Authentication Screens
+### 7.1 Authentication & Onboarding
 
-#### **Screen: Login** (`/auth/login`)
-**Components:**
-- App logo/branding
-- Email input field
-- Password input field (with show/hide toggle)
-- "Login" button (primary)
-- "Forgot Password?" link
-- Social login buttons (Google, Apple)
-- "Don't have an account? Sign Up" link
+**US-001: User Registration** 🚧
+**Status:** Needs Implementation
+**Files to Create:**
+- `app/(auth)/signup.tsx`
+- `src/services/authService.ts` (signUp function)
+- `src/contexts/AuthContext.tsx`
 
-**Validation:**
-- Email format validation
-- Password minimum 8 characters
-- Show error messages inline
-
-#### **Screen: Sign Up** (`/auth/signup`)
-**Components:**
-- Email input
-- Username input (3-50 characters)
-- Password input (min 8 chars, show strength indicator)
-- Confirm password input
-- "Create Account" button
-- Social sign-up buttons
-- "Already have an account? Login" link
-
-**Validation:**
-- All fields required
-- Passwords must match
-- Username unique check
-- Email unique check
-
-### 5.2 Onboarding Screens
-
-#### **Screen: Family Onboarding** (`/onboarding`)
-**Components:**
-- Welcome message
-- Two option cards:
-  1. "Create New Family" (with icon)
-  2. "Join Existing Family" (with icon)
-- Each card navigates to respective screen
-
-#### **Screen: Create Family** (`/onboarding/create`)
-**Components:**
-- Family name input (required, max 100 chars)
-- Family description textarea (optional, max 500 chars)
-- "Create Family" button
-- Auto-generated invite code display after creation
-- "Copy Invite Code" button
-- "Continue to Home" button
-
-#### **Screen: Join Family** (`/onboarding/join`)
-**Components:**
-- Invite code input (8 characters, uppercase)
-- "Join Family" button
-- "Back" button
-- Loading state during validation
-- Error message for invalid codes
-- Success message and auto-redirect on valid code
-
-### 5.3 Main App Screens
-
-#### **Screen: Notes Feed** (`/home` or `/notes`)
-**Navigation:** Bottom Tab (Home icon)
-
-**Components:**
-- Header:
-  - Family name
-  - Member count badge
-  - Settings/info icon
-- Filter chips row (All, General, Reminder, Shopping, Todo)
-- Search bar (collapsible/expandable)
-- Floating Action Button (FAB) - "+" to create note
-- Notes List (FlatList):
-  - Each note card contains:
-    - Author avatar (left)
-    - Author name
-    - Note content (text)
-    - Note image (if exists) - tappable for full-screen
-    - Emoji badge (if exists)
-    - Type badge
-    - Timestamp
-    - Action icons (edit/delete - only for author)
-- Pull-to-refresh
-- Empty state: "No notes yet. Create the first one!"
-
-**Real-time Updates:**
-- Subscribe to notes table changes
-- New notes appear at top
-- Edited notes update in place
-- Deleted notes removed from list
-
-#### **Screen: Create/Edit Note** (`/notes/create` or `/notes/edit/:id`)
-**Modal/Full Screen**
-
-**Components:**
-- Text input (multiline, placeholder: "What's on your mind?")
-- Image picker button
-  - Options: Camera, Gallery, Remove
-  - Image preview if selected
-- Note type selector (segmented control or dropdown)
-  - General (default)
-  - Reminder
-  - Shopping
-  - Todo
-- Emoji picker button (opens emoji selector)
-- Selected emoji preview
-- "Save" button (header right)
-- "Cancel" button (header left)
-
-**Validation:**
-- Text content required (min 1 character)
-- Image optional, max 5MB
-- Auto-save draft to local storage
-
-#### **Screen: Family Info** (`/family`)
-**Navigation:** Bottom Tab or Header Icon
-
-**Components:**
-- Family Details Card:
-  - Family name (large)
-  - Description
-  - Created date
-  - Creator badge
-- Invite Code Section:
-  - Display code in large, copyable text
-  - "Copy Code" button
-  - "Share Code" button (native share)
-- Members Section:
-  - List of all family members
-  - Each member shows: avatar, username, "Creator" badge if applicable
-  - Member count
-- Actions:
-  - "Leave Family" button (danger style)
-  - "Delete Family" button (only for creator, danger style)
-
-#### **Screen: Profile** (`/profile`)
-**Navigation:** Bottom Tab (Profile icon)
-
-**Components:**
-- Profile header:
-  - Large avatar (tappable to change)
-  - Username (tappable to edit)
-  - Email (read-only)
-- Account Info:
-  - Member since date
-  - Family membership status
-- Settings/Actions:
-  - "Edit Profile" button
-  - "Change Password" button (if email/password auth)
-  - "Logout" button (danger style)
-
-#### **Screen: Edit Profile** (`/profile/edit`)
-**Components:**
-- Avatar picker (circular)
-- Username input
-- "Save Changes" button
-- "Cancel" button
-
----
-
-## 6. Technical Implementation Details
-
-### 6.1 Project Structure
-
-```
-family-note-taker/
-├── app/                          # Expo Router screens
-│   ├── (auth)/
-│   │   ├── login.tsx
-│   │   ├── signup.tsx
-│   │   └── forgot-password.tsx
-│   ├── (onboarding)/
-│   │   ├── index.tsx            # Choose create/join
-│   │   ├── create.tsx
-│   │   └── join.tsx
-│   ├── (tabs)/                   # Main app tabs
-│   │   ├── _layout.tsx          # Tab navigator
-│   │   ├── index.tsx            # Notes feed
-│   │   ├── family.tsx           # Family info
-│   │   └── profile.tsx          # User profile
-│   ├── notes/
-│   │   ├── create.tsx
-│   │   └── [id].tsx             # Edit note
-│   └── _layout.tsx              # Root layout
-├── src/
-│   ├── components/
-│   │   ├── NoteCard.tsx
-│   │   ├── MemberAvatar.tsx
-│   │   ├── ImagePicker.tsx
-│   │   ├── EmojiPicker.tsx
-│   │   └── TypeSelector.tsx
-│   ├── contexts/
-│   │   ├── AuthContext.tsx
-│   │   └── FamilyContext.tsx
-│   ├── services/
-│   │   ├── firebase.ts          # Firebase config & auth
-│   │   ├── supabase.ts          # Supabase client
-│   │   ├── authService.ts       # Auth operations
-│   │   ├── familyService.ts     # Family CRUD
-│   │   ├── noteService.ts       # Note CRUD
-│   │   └── storageService.ts    # Image upload
-│   ├── hooks/
-│   │   ├── useAuth.ts
-│   │   ├── useFamily.ts
-│   │   ├── useNotes.ts
-│   │   └── useRealtime.ts
-│   ├── types/
-│   │   ├── database.types.ts    # Generated from Supabase
-│   │   ├── family.types.ts
-│   │   ├── note.types.ts
-│   │   └── user.types.ts
-│   ├── utils/
-│   │   ├── validation.ts
-│   │   ├── formatters.ts        # Date, text formatting
-│   │   └── constants.ts
-│   └── theme/
-│       └── theme.ts              # Colors, spacing, typography
-├── assets/
-│   ├── images/
-│   └── icons/
-├── app.json
-├── package.json
-├── tsconfig.json
-└── README.md
-```
-
-### 6.2 Authentication Flow
-
+**Implementation Example:**
 ```typescript
-// src/services/firebase.ts
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-
-const firebaseConfig = {
-  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
-  // ... other config
-};
-
-export const firebaseApp = initializeApp(firebaseConfig);
-export const auth = getAuth(firebaseApp);
-
-// src/services/supabase.ts
-import { createClient } from '@supabase/supabase-js';
-
-export const supabase = createClient(
-  process.env.EXPO_PUBLIC_SUPABASE_URL!,
-  process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!
-);
-
 // src/services/authService.ts
-export const signUpWithEmail = async (email: string, password: string, username: string) => {
-  // 1. Create Firebase user
-  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-  const firebaseUser = userCredential.user;
-  
-  // 2. Get Firebase ID token
-  const idToken = await firebaseUser.getIdToken();
-  
-  // 3. Create Supabase user profile
-  const { data, error } = await supabase
-    .from('users')
-    .insert({
-      id: firebaseUser.uid,
-      email: firebaseUser.email,
-      username: username,
-      family_id: null
-    });
-  
-  return { user: firebaseUser, error };
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from './firebase';
+import { supabase } from './supabase';
+
+export const signUpWithEmail = async (
+  email: string, 
+  password: string, 
+  username: string
+) => {
+  try {
+    // 1. Create Firebase user
+    const userCredential = await createUserWithEmailAndPassword(
+      auth, 
+      email, 
+      password
+    );
+    const firebaseUser = userCredential.user;
+    
+    // 2. Create Supabase user profile
+    const { data, error } = await supabase
+      .from('users')
+      .insert({
+        id: firebaseUser.uid,
+        email: firebaseUser.email,
+        username: username,
+        family_id: null
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    return { user: data, error: null };
+  } catch (error: any) {
+    return { user: null, error: error.message };
+  }
 };
+```
 
-// src/contexts/AuthContext.tsx
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+**Screen Design (`app/(auth)/signup.tsx`):**
+```typescript
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { router } from 'expo-router';
+import { useState } from 'react';
+import { TextInput, TouchableOpacity, Alert } from 'react-native';
+import { signUpWithEmail } from '@/src/services/authService';
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        // Fetch user profile from Supabase
-        const { data } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', firebaseUser.uid)
-          .single();
-        
-        setUser(data);
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
+export default function SignUpScreen() {
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    return unsubscribe;
-  }, []);
+  const handleSignUp = async () => {
+    if (!email || !username || !password) {
+      Alert.alert('Error', 'Please fill all fields');
+      return;
+    }
+
+    setLoading(true);
+    const { user, error } = await signUpWithEmail(email, password, username);
+    setLoading(false);
+
+    if (error) {
+      Alert.alert('Sign Up Failed', error);
+    } else {
+      router.replace('/(onboarding)');
+    }
+  };
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
-      {children}
-    </AuthContext.Provider>
+    <ThemedView className="flex-1 p-5 bg-background">
+      <ThemedText type="title" className="mt-20 mb-10">
+        Create Account
+      </ThemedText>
+      
+      <TextInput
+        className="p-4 mb-4 bg-white rounded-2xl"
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
+      
+      <TextInput
+        className="p-4 mb-4 bg-white rounded-2xl"
+        placeholder="Username"
+        value={username}
+        onChangeText={setUsername}
+      />
+      
+      <TextInput
+        className="p-4 mb-6 bg-white rounded-2xl"
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+      
+      <TouchableOpacity
+        className="p-4 bg-primary rounded-full"
+        onPress={handleSignUp}
+        disabled={loading}
+      >
+        <ThemedText className="text-center text-white font-semibold">
+          {loading ? 'Creating Account...' : 'Sign Up'}
+        </ThemedText>
+      </TouchableOpacity>
+      
+      <TouchableOpacity
+        className="mt-4"
+        onPress={() => router.push('/(auth)/login')}
+      >
+        <ThemedText className="text-center text-primary">
+          Already have an account? Login
+        </ThemedText>
+      </TouchableOpacity>
+    </ThemedView>
   );
+}
+```
+
+---
+
+**US-003: Create Family** 📝
+**Status:** Needs Implementation
+**Files to Create:**
+- `app/(onboarding)/create.tsx`
+- `src/services/familyService.ts`
+
+**Implementation:**
+```typescript
+// src/services/familyService.ts
+import { supabase } from './supabase';
+
+const generateInviteCode = (): string => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+};
+
+export const createFamily = async (
+  name: string,
+  description: string,
+  creatorId: string
+) => {
+  try {
+    const inviteCode = generateInviteCode();
+    
+    // 1. Create family
+    const { data: family, error: familyError } = await supabase
+      .from('families')
+      .insert({
+        name,
+        description,
+        creator_id: creatorId,
+        invite_code: inviteCode
+      })
+      .select()
+      .single();
+    
+    if (familyError) throw familyError;
+    
+    // 2. Update user's family_id
+    const { error: userError } = await supabase
+      .from('users')
+      .update({ family_id: family.id })
+      .eq('id', creatorId);
+    
+    if (userError) throw userError;
+    
+    return { family, error: null };
+  } catch (error: any) {
+    return { family: null, error: error.message };
+  }
 };
 ```
 
-### 6.3 Real-time Subscriptions
+---
 
+**US-008: Create Note** 🚧
+**Status:** Partially Implemented (UI done, backend needed)
+**Current File:** `app/modal.tsx` ✅
+**Files to Create:**
+- `src/services/noteService.ts`
+- `components/NoteCard.tsx`
+
+**Backend Implementation Needed:**
+```typescript
+// src/services/noteService.ts
+import { supabase } from './supabase';
+
+export const createNote = async (
+  familyId: string,
+  userId: string,
+  textContent: string,
+  category: string,
+  emoji: string | null,
+  imageUrl: string | null
+) => {
+  try {
+    const { data, error } = await supabase
+      .from('notes')
+      .insert({
+        family_id: familyId,
+        user_id: userId,
+        text_content: textContent,
+        category,
+        emoji,
+        image_url: imageUrl
+      })
+      .select(`
+        *,
+        users (username, image_url)
+      `)
+      .single();
+    
+    if (error) throw error;
+    
+    return { note: data, error: null };
+  } catch (error: any) {
+    return { note: null, error: error.message };
+  }
+};
+```
+
+**Update Modal to Save Note:**
+```typescript
+// app/modal.tsx - Update handleSave function
+import { createNote } from '@/src/services/noteService';
+import { useAuth } from '@/src/contexts/AuthContext'; // To be created
+
+const handleSave = async () => {
+  if (!noteText.trim()) {
+    Alert.alert('Error', 'Please enter some text');
+    return;
+  }
+  
+  const { user } = useAuth(); // Get current user
+  
+  const { note, error } = await createNote(
+    user.family_id,
+    user.id,
+    noteText,
+    selectedCategory || 'update',
+    selectedEmoji,
+    null // Image URL (to be implemented)
+  );
+  
+  if (error) {
+    Alert.alert('Error', 'Failed to create note');
+  } else {
+    router.back();
+  }
+};
+```
+
+---
+
+**US-009: View Notes Feed** 🚧
+**Status:** Partially Implemented (UI done, backend needed)
+**Current File:** `app/(tabs)/index.tsx` ✅
+**Files to Create:**
+- `src/hooks/useNotes.ts`
+- `components/NoteCard.tsx`
+
+**Implementation:**
 ```typescript
 // src/hooks/useNotes.ts
+import { useState, useEffect } from 'react';
+import { supabase } from '@/src/services/supabase';
+
 export const useNotes = (familyId: string) => {
-  const [notes, setNotes] = useState<Note[]>([]);
+  const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -626,11 +637,11 @@ export const useNotes = (familyId: string) => {
         },
         (payload) => {
           if (payload.eventType === 'INSERT') {
-            setNotes(prev => [payload.new as Note, ...prev]);
+            setNotes(prev => [payload.new, ...prev]);
           } else if (payload.eventType === 'UPDATE') {
             setNotes(prev => 
               prev.map(note => 
-                note.id === payload.new.id ? payload.new as Note : note
+                note.id === payload.new.id ? payload.new : note
               )
             );
           } else if (payload.eventType === 'DELETE') {
@@ -651,168 +662,266 @@ export const useNotes = (familyId: string) => {
 };
 ```
 
-### 6.4 Image Upload Implementation
-
+**NoteCard Component:**
 ```typescript
-// src/services/storageService.ts
-export const uploadNoteImage = async (
-  uri: string, 
-  userId: string, 
-  familyId: string
-): Promise<string | null> => {
-  try {
-    // 1. Manipulate image (compress, resize)
-    const manipResult = await ImageManipulator.manipulateAsync(
-      uri,
-      [{ resize: { width: 1200 } }],
-      { compress: 0.7, format: SaveFormat.JPEG }
-    );
+// components/NoteCard.tsx
+import { ThemedText } from './themed-text';
+import { Image } from 'expo-image';
+import { View, TouchableOpacity } from 'react-native';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import { formatDistanceToNow } from 'date-fns'; // npm install date-fns
 
-    // 2. Convert to blob
-    const response = await fetch(manipResult.uri);
-    const blob = await response.blob();
+interface NoteCardProps {
+  note: {
+    id: string;
+    text_content: string;
+    emoji: string | null;
+    category: string;
+    image_url: string | null;
+    created_at: string;
+    users: {
+      username: string;
+      image_url: string | null;
+    };
+  };
+  currentUserId: string;
+  onEdit?: () => void;
+  onDelete?: () => void;
+}
 
-    // 3. Generate unique filename
-    const filename = `${familyId}/${userId}/${Date.now()}.jpg`;
+export function NoteCard({ note, currentUserId, onEdit, onDelete }: NoteCardProps) {
+  const categoryColors = {
+    reminder: { text: '#EC4D6B', bg: '#FEE7EF' },
+    celebration: { text: '#47C2BE', bg: '#E4F7F6' },
+    request: { text: '#F9BE1A', bg: '#FFF7DE' },
+    memory: { text: '#7A6DAE', bg: '#F2F0FA' },
+    update: { text: '#56C6B2', bg: '#E9F7F6' },
+  };
 
-    // 4. Upload to Supabase Storage
-    const { data, error } = await supabase.storage
-      .from('note-images')
-      .upload(filename, blob, {
-        contentType: 'image/jpeg',
-        upsert: false
-      });
+  const colors = categoryColors[note.category] || categoryColors.update;
+  const isOwner = note.user_id === currentUserId;
 
-    if (error) throw error;
+  return (
+    <View className="gap-5 p-5 bg-white rounded-3xl shadow-sm mb-4">
+      {/* Header */}
+      <View className="flex-row justify-between items-start">
+        <View className="flex-row gap-2 items-center flex-1">
+          <Image
+            style={{ width: 40, height: 40, borderRadius: 20 }}
+            source={{ uri: note.users.image_url || 'https://via.placeholder.com/40' }}
+          />
+          <View className="flex-1">
+            <ThemedText type="subtitle" className="font-medium">
+              {note.users.username}
+            </ThemedText>
+            <ThemedText className="text-sm opacity-60 text-muted">
+              {formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}
+            </ThemedText>
+          </View>
+        </View>
+        
+        <View className="flex-row gap-2 items-center">
+          {/* Category Badge */}
+          <View 
+            className="px-3 py-1 rounded-full"
+            style={{ backgroundColor: colors.bg }}
+          >
+            <ThemedText 
+              className="text-xs font-medium"
+              style={{ color: colors.text }}
+            >
+              {note.category}
+            </ThemedText>
+          </View>
+          
+          {/* Emoji */}
+          {note.emoji && (
+            <ThemedText className="text-2xl">{note.emoji}</ThemedText>
+          )}
+        </View>
+      </View>
 
-    // 5. Get public URL
-    const { data: urlData } = supabase.storage
-      .from('note-images')
-      .getPublicUrl(filename);
+      {/* Content */}
+      <ThemedText className="text-sm text-text">
+        {note.text_content}
+      </ThemedText>
 
-    return urlData.publicUrl;
-  } catch (error) {
-    console.error('Image upload error:', error);
-    return null;
-  }
-};
+      {/* Image */}
+      {note.image_url && (
+        <Image
+          style={{ width: '100%', height: 200, borderRadius: 16 }}
+          source={{ uri: note.image_url }}
+          contentFit="cover"
+        />
+      )}
+
+      {/* Actions (only for owner) */}
+      {isOwner && (
+        <View className="flex-row gap-3 justify-end">
+          <TouchableOpacity onPress={onEdit}>
+            <AntDesign name="edit" size={18} color="#0F9E99" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onDelete}>
+            <AntDesign name="delete" size={18} color="#EC4D6B" />
+          </TouchableOpacity>
+        </View>
+      )}
+    </View>
+  );
+}
 ```
 
-### 6.5 Row Level Security (RLS) Policies
+---
+
+## 8. Files to Create (Priority Order)
+
+### Week 2: Authentication
+1. **`src/contexts/AuthContext.tsx`** - Authentication context provider
+2. **`src/services/authService.ts`** - Auth functions (signup, login, logout)
+3. **`app/(auth)/login.tsx`** - Login screen
+4. **`app/(auth)/signup.tsx`** - Sign up screen
+5. **`app/(auth)/forgot-password.tsx`** - Password reset screen
+6. **`src/types/user.types.ts`** - User type definitions
+
+### Week 3: Family Management
+7. **`src/contexts/FamilyContext.tsx`** - Family context provider
+8. **`src/services/familyService.ts`** - Family CRUD operations
+9. **`app/(onboarding)/index.tsx`** - Onboarding welcome screen
+10. **`app/(onboarding)/create.tsx`** - Create family screen
+11. **`app/(onboarding)/join.tsx`** - Join family screen
+12. **`src/types/family.types.ts`** - Family type definitions
+
+### Week 4: Notes CRUD
+13. **`src/services/noteService.ts`** - Note CRUD operations
+14. **`src/hooks/useNotes.ts`** - Notes hook with real-time
+15. **`components/NoteCard.tsx`** - Note display component
+16. **`src/types/note.types.ts`** - Note type definitions
+
+### Week 5: Storage & Images
+17. **`src/services/storageService.ts`** - Image upload/download
+18. **`components/ImagePicker.tsx`** - Image picker component
+
+### Week 6+: Additional Features
+19. **`components/MemberAvatar.tsx`** - Member avatar component
+20. **`utils/validation.ts`** - Form validation utilities
+21. **`utils/formatters.ts`** - Date/text formatting utilities
+
+---
+
+## 9. Database Setup (Supabase)
+
+### SQL Schema (Run in Supabase SQL Editor)
 
 ```sql
--- Example: Notes table RLS
--- Users can only see notes from their family
-CREATE POLICY "Users can view family notes"
-  ON notes FOR SELECT
-  USING (
-    family_id IN (
-      SELECT family_id FROM users WHERE id = auth.uid()
-    )
-  );
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Users can only create notes in their own family
-CREATE POLICY "Users can create notes in their family"
-  ON notes FOR INSERT
-  WITH CHECK (
-    user_id = auth.uid() 
-    AND family_id IN (
-      SELECT family_id FROM users WHERE id = auth.uid()
-    )
-  );
+-- Families Table
+CREATE TABLE families (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    creator_id UUID NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    invite_code VARCHAR(20) UNIQUE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Users Table
+CREATE TABLE users (
+    id UUID PRIMARY KEY, -- Matches Firebase Auth UID
+    email VARCHAR(255) UNIQUE NOT NULL,
+    family_id UUID REFERENCES families(id) ON DELETE SET NULL,
+    username VARCHAR(50) NOT NULL,
+    image_url TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Notes Table
+CREATE TABLE notes (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    family_id UUID NOT NULL REFERENCES families(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    text_content TEXT NOT NULL,
+    image_url TEXT,
+    category VARCHAR(50) DEFAULT 'update',
+    emoji VARCHAR(10),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_users_family_id ON users(family_id);
+CREATE INDEX idx_notes_family_id ON notes(family_id);
+CREATE INDEX idx_notes_created_at ON notes(created_at DESC);
+CREATE INDEX idx_families_invite_code ON families(invite_code);
+
+-- Updated_at Triggers
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_families_updated_at BEFORE UPDATE ON families
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_notes_updated_at BEFORE UPDATE ON notes
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Enable RLS
+ALTER TABLE families ENABLE ROW LEVEL SECURITY;
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies (simplified for Firebase auth)
+-- Note: You'll need to set up Firebase -> Supabase JWT integration
+CREATE POLICY "Users can view their family" ON families
+    FOR SELECT USING (true);
+
+CREATE POLICY "Users can create families" ON families
+    FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Users can view profiles" ON users
+    FOR SELECT USING (true);
+
+CREATE POLICY "Users can insert their profile" ON users
+    FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Users can view notes" ON notes
+    FOR SELECT USING (true);
+
+CREATE POLICY "Users can create notes" ON notes
+    FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Users can update their notes" ON notes
+    FOR UPDATE USING (user_id = auth.uid());
+
+CREATE POLICY "Users can delete their notes" ON notes
+    FOR DELETE USING (user_id = auth.uid());
 ```
 
----
+### Storage Buckets Setup
 
-## 7. Non-Functional Requirements
-
-### 7.1 Performance
-- App launch time: < 3 seconds
-- Note creation/save: < 2 seconds
-- Image upload: < 5 seconds (depending on network)
-- Real-time updates: < 1 second latency
-- Smooth scrolling at 60 FPS
-
-### 7.2 Security
-- All API keys in environment variables (never committed)
-- Firebase Authentication with secure token handling
-- Supabase Row Level Security enforced on all tables
-- Image uploads restricted to authenticated users
-- Input validation and sanitization
-- HTTPS only for all network requests
-
-### 7.3 Scalability
-- Support up to 50 members per family
-- Support up to 10,000 notes per family
-- Pagination for notes (20-50 per page)
-- Image compression before upload (max 1200px width)
-- Lazy loading for images in feed
-
-### 7.4 Offline Support (Future Enhancement)
-- Cache recent notes for offline viewing
-- Queue note creation for sync when online
-- Show offline indicator in UI
-
-### 7.5 Accessibility
-- All interactive elements have accessible labels
-- Minimum touch target size: 44x44 points
-- Support for screen readers
-- Proper color contrast ratios (WCAG AA)
-- Adjustable font sizes
+1. Go to Supabase Dashboard → Storage
+2. Create two buckets:
+   - **`user-avatars`** (Public)
+   - **`note-images`** (Public - will add RLS later)
 
 ---
 
-## 8. Error Handling
+## 10. Environment Variables
 
-### 8.1 Network Errors
-- Show toast/snackbar with error message
-- Retry mechanism for failed requests
-- Offline mode indicator
-
-### 8.2 Authentication Errors
-- Clear error messages for login/signup failures
-- Email verification reminders
-- Password reset flow
-
-### 8.3 Validation Errors
-- Inline field validation
-- Highlight invalid fields in red
-- Clear error messages below fields
-
-### 8.4 Upload Errors
-- Show upload progress indicator
-- Retry option for failed uploads
-- Clear error messages (file too large, wrong format, etc.)
-
----
-
-## 9. Testing Requirements
-
-### 9.1 Unit Tests
-- Authentication service functions
-- Validation utilities
-- Data formatting functions
-- Custom hooks logic
-
-### 9.2 Integration Tests
-- Firebase + Supabase authentication flow
-- Note CRUD operations with database
-- Image upload to storage
-- Real-time subscription handling
-
-### 9.3 E2E Tests (Optional)
-- Complete user journey: signup → create family → create note
-- Join family flow
-- Edit and delete note flow
-
----
-
-## 10. Deployment & Environment Setup
-
-### 10.1 Environment Variables
+**File:** `.env` (create from `.env.example`)
 
 ```env
-# .env file
+# Firebase Configuration
 EXPO_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
 EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
 EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
@@ -820,87 +929,88 @@ EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
 EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
 EXPO_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abcdef
 
+# Supabase Configuration
 EXPO_PUBLIC_SUPABASE_URL=https://your_project.supabase.co
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-```
-
-### 10.2 Firebase Setup Checklist
-1. Create Firebase project
-2. Enable Authentication methods:
-   - Email/Password
-   - Google
-   - Apple (for iOS)
-3. Add iOS/Android apps in Firebase console
-4. Download and configure `google-services.json` (Android) and `GoogleService-Info.plist` (iOS)
-
-### 10.3 Supabase Setup Checklist
-1. Create Supabase project
-2. Run database schema SQL (from earlier artifacts)
-3. Enable Row Level Security on all tables
-4. Create storage buckets:
-   - `user-avatars` (public)
-   - `note-images` (private with RLS)
-5. Set up storage policies for family-scoped access
-6. Get project URL and anon key
-
-### 10.4 Expo Setup
-```bash
-# Install Expo CLI
-npm install -g expo-cli
-
-# Create project
-npx create-expo-app family-note-taker --template blank-typescript
-
-# Install dependencies
-npm install @supabase/supabase-js firebase @react-navigation/native @react-navigation/stack expo-router react-native-paper
-
-# Install Expo packages
-npx expo install expo-image-picker expo-clipboard expo-sharing react-native-safe-area-context react-native-screens
-
-# Start development
-npx expo start
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 ---
 
-## 11. Future Enhancements (Post-MVP)
+## 11. Testing Checklist
 
-### 11.1 Phase 2 Features
-- [ ] Push notifications for new notes
-- [ ] Note comments/replies
-- [ ] Note reactions (like, heart, etc.)
-- [ ] Rich text formatting (bold, italic, lists)
-- [ ] Voice notes
-- [ ] Location tagging
-- [ ] Calendar integration for reminders
+### Unit Tests (Future)
+- [ ] Authentication service functions
+- [ ] Family service functions
+- [ ] Note service functions
+- [ ] Validation utilities
+- [ ] Formatters
 
-### 11.2 Phase 3 Features
-- [ ] Multiple families per user
-- [ ] Family roles (admin, member, viewer)
-- [ ] Note archiving
-- [ ] Export notes (PDF, CSV)
-- [ ] Dark mode
-- [ ] Note templates
-- [ ] Recurring reminders
-- [ ] Family calendar view
+### Integration Tests (Future)
+- [ ] Firebase + Supabase auth flow
+- [ ] Note CRUD with real-time
+- [ ] Family creation and joining
+- [ ] Image upload to storage
+
+### Manual Testing (Current Priority)
+- [ ] Sign up new user
+- [ ] Login existing user
+- [ ] Create family
+- [ ] Join family with invite code
+- [ ] Create note with emoji and category
+- [ ] View notes in feed
+- [ ] Edit own note
+- [ ] Delete own note
+- [ ] Upload note image
+- [ ] Upload user avatar
+- [ ] Real-time note updates
+- [ ] Leave family
+- [ ] Delete family (creator only)
 
 ---
 
-## 12. Success Metrics
+## 12. Known Issues & TODOs
 
-### 12.1 User Engagement
+### High Priority
+- [ ] Implement AuthContext for authentication state
+- [ ] Implement FamilyContext for family state
+- [ ] Connect create note modal to Supabase
+- [ ] Implement image upload functionality
+- [ ] Add pull-to-refresh on notes feed
+- [ ] Add error handling and loading states
+- [ ] Add form validation
+
+### Medium Priority
+- [ ] Add search functionality for notes
+- [ ] Add filter by category
+- [ ] Implement edit note functionality
+- [ ] Add confirmation dialogs for destructive actions
+- [ ] Add offline support
+- [ ] Optimize images (compression, resizing)
+
+### Low Priority
+- [ ] Add dark mode support
+- [ ] Add more languages
+- [ ] Add push notifications
+- [ ] Add note comments
+- [ ] Add note reactions
+
+---
+
+## 13. Success Metrics
+
+### User Engagement
 - Daily Active Users (DAU)
 - Weekly Active Users (WAU)
-- Average notes created per user per week
+- Average notes created per family per week
 - Average session duration
 
-### 12.2 Technical Metrics
+### Technical Metrics
 - App crash rate < 1%
 - API error rate < 2%
 - Average API response time < 500ms
 - Image upload success rate > 95%
 
-### 12.3 Business Metrics
+### Business Metrics
 - User retention (Day 1, Day 7, Day 30)
 - Family creation rate
 - Average family size
@@ -908,79 +1018,38 @@ npx expo start
 
 ---
 
-## 13. Support & Documentation
+## Appendix: Quick Start Guide
 
-### 13.1 In-App Help
-- Onboarding tutorial (first launch)
-- Tooltips for key features
-- FAQ section in settings
-- Contact support option
+### 1. Install Dependencies
+```bash
+npm install
+# or
+yarn install
+```
 
-### 13.2 Developer Documentation
-- README with setup instructions
-- API documentation (services)
-- Component documentation
-- Contribution guidelines
+### 2. Setup Environment Variables
+```bash
+cp .env.example .env
+# Edit .env with your Firebase and Supabase credentials
+```
+
+### 3. Run Supabase Schema
+- Copy SQL from Section 9 above
+- Paste into Supabase SQL Editor
+- Execute
+
+### 4. Start Development Server
+```bash
+npx expo start
+```
+
+### 5. Next Steps
+- Implement AuthContext (Week 2)
+- Create authentication screens
+- Test Firebase + Supabase integration
 
 ---
 
-## Appendix A: Glossary
-
-- **Family**: A group of users sharing a common note space
-- **Invite Code**: 8-character unique code for joining a family
-- **Creator**: User who created the family (special permissions)
-- **Note Type**: Category of note (general, reminder, shopping, todo)
-- **RLS**: Row Level Security (Supabase database security)
-- **FAB**: Floating Action Button
-
----
-
-## Appendix B: API Reference Summary
-
-### Authentication API (Firebase)
-```typescript
-signUpWithEmail(email, password, username)
-signInWithEmail(email, password)
-signInWithGoogle()
-signInWithApple()
-signOut()
-resetPassword(email)
-```
-
-### Family API (Supabase)
-```typescript
-createFamily(name, description, creatorId)
-joinFamily(inviteCode, userId)
-getFamily(familyId)
-getFamilyMembers(familyId)
-leaveFamily(userId)
-deleteFamily(familyId) // creator only
-```
-
-### Notes API (Supabase)
-```typescript
-createNote(familyId, userId, content, imageUrl, type, emoji)
-getNotes(familyId, limit, offset)
-updateNote(noteId, updates)
-deleteNote(noteId)
-searchNotes(familyId, searchTerm)
-```
-
-### Storage API (Supabase)
-```typescript
-uploadImage(bucket, path, file)
-deleteImage(bucket, path)
-getPublicUrl(bucket, path)
-```
-
----
-
-## Document Control
-
-**Author:** Product Team  
-**Reviewers:** Engineering, Design, QA  
-**Approval:** Product Manager  
-**Next Review Date:** After MVP completion  
-
-**Change Log:**
-- v1.0 (Nov 26, 2025): Initial PRD created
+**Document Version:** 1.1  
+**Last Updated:** November 28, 2025  
+**Status:** Living Document - Update as implementation progresses

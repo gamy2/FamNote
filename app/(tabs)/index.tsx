@@ -1,6 +1,7 @@
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 
+import { categories, emojis } from "@/constants/categories";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -11,53 +12,68 @@ export default function HomeScreen() {
     <ThemedView className="relative flex-1">
       <FamNoteHeader />
       <ScrollView
-        className="flex-1 p-8 bg-background"
+        className="flex-1 p-8 bg-backgroundV2"
         showsVerticalScrollIndicator={false}
       >
         <ThemedView className="gap-5 mb-14">
-          {[...Array(8)].map((_, i) => (
-            <View
-              key={i}
-              className="gap-5 p-5 bg-white rounded-3xl shadow-primary"
-            >
-              <View className="flex-row justify-between items-start">
-                <View className="flex-row gap-2 items-center">
-                  <Image
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 50,
-                      borderWidth: 3,
-                      borderColor: "#0F9E99", // Added border color for visibility
-                    }}
-                    source={{
-                      uri: "https://blog.logrocket.com/wp-content/uploads/2024/01/react-native-navigation-tutorial.png",
-                    }}
-                  />
-                  <View>
-                    <ThemedText type="subtitle" className="font-medium">
-                      Dad
-                    </ThemedText>
-                    <ThemedText className="text-sm opacity-60 text-muted">
-                      2 hours ago
+          {[...Array(8)].map((_, i) => {
+            const category = categories[i % categories.length];
+            const emoji = emojis[i % emojis.length];
+            return (
+              <View
+                key={i}
+                className="gap-2 p-5 rounded-3xl shadow-primary"
+                style={{ backgroundColor: category.bgColor }}
+              >
+                <View className="flex-row justify-between items-start">
+                  <View className="flex-row gap-2 items-center">
+                    <Image
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 50,
+                        borderWidth: 3,
+                        borderColor: "#fff", // Added border color for visibility
+                      }}
+                      source={{
+                        uri: "https://blog.logrocket.com/wp-content/uploads/2024/01/react-native-navigation-tutorial.png",
+                      }}
+                    />
+                    <View>
+                      <ThemedText 
+                        type="subtitle" 
+                        className="font-medium"
+                        style={{ color: category.textColor }}
+                      >
+                        Dad
+                      </ThemedText>
+                      <ThemedText className="text-sm opacity-60 text-muted">
+                        2 hours ago
+                      </ThemedText>
+                    </View>
+                  </View>
+                  <View className="px-3 py-1 rounded-full" style={{ backgroundColor: category.textColor + '20' }}>
+                    <ThemedText 
+                      className="text-xs font-medium"
+                      style={{ color: category.textColor }}
+                    >
+                      {category.label}
                     </ThemedText>
                   </View>
                 </View>
-                <View className="flex-row gap-3 items-center p-1 px-4 rounded-full bg-primary">
-                  <ThemedText className="text-sm text-white">
-                    Add Note
-                  </ThemedText>
+                <View className="flex-row gap-2 items-center py-1" style={{ overflow: 'visible' }}>
+                  <ThemedText style={{ fontSize: 32, lineHeight: 32  }}>{emoji}</ThemedText>
                 </View>
+                <ThemedText className="text-base text-text">
+                  Sharing moments together Lorem ipsum dolor sit amet consectetur
+                  adipisicing elit. Provident, ad? Quisquam assumenda facilis
+                  deleniti voluptas optio repellendus et eligendi ullam provident
+                  explicabo aperiam cupiditate maxime maiores, ut itaque.
+                  Delectus, architecto?
+                </ThemedText>
               </View>
-              <ThemedText className="text-sm text-text">
-                Sharing moments together Lorem ipsum dolor sit amet consectetur
-                adipisicing elit. Provident, ad? Quisquam assumenda facilis
-                deleniti voluptas optio repellendus et eligendi ullam provident
-                explicabo aperiam cupiditate maxime maiores, ut itaque.
-                Delectus, architecto?
-              </ThemedText>
-            </View>
-          ))}
+            );
+          })}
         </ThemedView>
       </ScrollView>
       <TouchableOpacity 

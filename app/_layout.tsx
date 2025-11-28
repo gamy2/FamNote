@@ -1,3 +1,4 @@
+import { AuthProvider } from "@/contexts/AuthContext";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
@@ -13,8 +14,9 @@ export const unstable_settings = {
 export default function RootLayout() {
 
   return (
-    <>
+    <AuthProvider>
       <Stack>
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="modal"
@@ -22,6 +24,6 @@ export default function RootLayout() {
         />
       </Stack>
       <StatusBar style="dark" />
-    </>
+    </AuthProvider>
   );
 }

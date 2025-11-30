@@ -8,8 +8,8 @@ import { supabase } from "@/services/supabase";
 import type { NoteWithUser } from "@/types/note.types";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Image } from "expo-image";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, TouchableOpacity, View } from "react-native";
 
 // Helper function to format date
@@ -32,43 +32,9 @@ const getCategoryByType = (type: string | null) => {
 };
 
 export default function HomeScreen() {
-  const { user } = useAuth();
-  const [familyId, setFamilyId] = useState<string | null>(null);
-  const [loadingFamily, setLoadingFamily] = useState(true);
-  const { notes, loading: loadingNotes, error, refreshNotes } = useNotes(familyId);
+  const { user, userProfile } = useAuth();
+  const { notes, loading: loadingNotes, error, refreshNotes } = useNotes(userProfile?.family_id || null);
   const [refreshing, setRefreshing] = useState(false);
-
-  // Fetch user's family_id from Supabase
-  useEffect(() => {
-    const fetchUserFamily = async () => {
-      if (!user?.uid) {
-        setLoadingFamily(false);
-        return;
-      }
-
-      try {
-        const { data, error: fetchError } = await supabase
-          .from('user')
-          .select('family_id')
-          .eq('id', user.uid)
-          .single();
-
-        if (fetchError) {
-          console.error('Error fetching user family:', fetchError);
-          setFamilyId(null);
-        } else {
-          setFamilyId(data?.family_id || null);
-        }
-      } catch (error) {
-        console.error('Error fetching user family:', error);
-        setFamilyId(null);
-      } finally {
-        setLoadingFamily(false);
-      }
-    };
-
-    fetchUserFamily();
-  }, [user]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -76,14 +42,23 @@ export default function HomeScreen() {
     setRefreshing(false);
   };
 
+  // Refresh notes when screen comes into focus (e.g., after creating a note)
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userProfile?.family_id) {
+        refreshNotes();
+      }
+    }, [userProfile?.family_id, refreshNotes])
+  );
+
   // Redirect to onboarding if no family
   useEffect(() => {
-    if (!loadingFamily && !familyId && user) {
+    if (userProfile && !userProfile.family_id && user) {
       router.replace('/(onboarding)');
     }
-  }, [loadingFamily, familyId, user]);
+  }, [userProfile, user]);
 
-  if (loadingFamily) {
+  if (!userProfile) {
     return (
       <ThemedView className="flex-1 justify-center items-center">
         <ActivityIndicator size="large" color="#0F9E99" />
@@ -91,7 +66,7 @@ export default function HomeScreen() {
     );
   }
 
-  if (!familyId) {
+  if (!userProfile.family_id) {
     return (
       <ThemedView className="flex-1 justify-center items-center p-5">
         <ActivityIndicator size="large" color="#0F9E99" />
@@ -104,7 +79,7 @@ export default function HomeScreen() {
 
   return (
     <ThemedView className="relative flex-1">
-      <FamNoteHeader familyId={familyId} />
+      <FamNoteHeader familyId={userProfile.family_id} />
       <ScrollView
         className="flex-1 p-8 bg-backgroundV2"
         showsVerticalScrollIndicator={false}
@@ -118,7 +93,7 @@ export default function HomeScreen() {
           </ThemedView>
         ) : error ? (
           <ThemedView className="flex-1 justify-center items-center py-20">
-            <ThemedText className="text-center text-muted mb-4">
+            <ThemedText className="mb-4 text-center text-muted">
               {error}
             </ThemedText>
             <TouchableOpacity
@@ -161,11 +136,13 @@ export default function HomeScreen() {
                           uri: note.user?.image || "https://blog.logrocket.com/wp-content/uploads/2024/01/react-native-navigation-tutorial.png",
                         }}
                       />
-                      <View>
+                      <View style={{ maxWidth: 150 }}>
                         <ThemedText 
                           type="subtitle" 
                           className="font-medium"
                           style={{ color: category.textColor }}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
                         >
                           {note.user?.username || 'Unknown'}
                         </ThemedText>
@@ -294,7 +271,8 @@ const FamNoteHeader = ({ familyId }: { familyId: string | null }) => {
                   uri: member.image || "https://blog.logrocket.com/wp-content/uploads/2024/01/react-native-navigation-tutorial.png",
                 }}
               />
-              <ThemedText className="text-xs text-text">{member.username || 'User'}</ThemedText>
+              <ThemedText className="text-xs text-text max-w-[60px]"   numberOfLines={1}
+                          ellipsizeMode="tail">{member.username || 'User'}</ThemedText>
             </ThemedView>
           ))}
         </ScrollView>

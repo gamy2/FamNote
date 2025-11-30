@@ -3,7 +3,7 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -16,6 +16,8 @@ import Animated, {
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { categories, emojis } from '@/constants/categories';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCreateNote } from '@/hooks/useCreateNote';
 
 
 // Animated Emoji Button Component
@@ -120,20 +122,81 @@ const AnimatedPickerButton = ({
 };
 
 export default function ModalScreen() {
+  const { user, userProfile } = useAuth();
+  const { loading, error, createNoteWithImage, pickImage } = useCreateNote();
+  
   const [noteText, setNoteText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
 
-  const handleSave = () => {
-    // TODO: Implement save functionality
-    console.log('Saving note:', { noteText, selectedCategory, selectedEmoji });
-    router.back();
+  const handlePickImage = async () => {
+    const uri = await pickImage();
+    if (uri) {
+      setSelectedImageUri(uri);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedImageUri(null);
+  };
+
+  const handleSave = async () => {
+    // Validate inputs
+    if (!noteText.trim()) {
+      Alert.alert('Validation Error', 'Please enter some text for your note');
+      return;
+    }
+
+    if (!user?.uid || !userProfile?.family_id) {
+      Alert.alert('Error', 'User or family information not found');
+      return;
+    }
+
+    // Create note
+    const success = await createNoteWithImage(user.uid, userProfile.family_id, {
+      text: noteText,
+      emoji: selectedEmoji,
+      type: selectedCategory as any,
+      imageUri: selectedImageUri,
+    });
+
+    if (success) {
+      // Navigate back first to trigger refresh
+      router.back();
+      // Show success message after navigation
+      setTimeout(() => {
+        Alert.alert('Success', 'Note shared with your family!');
+      }, 100);
+    } else if (error) {
+      Alert.alert('Error', error);
+    }
   };
 
   const handleCancel = () => {
-    router.back();
+    if (noteText.trim() || selectedImageUri) {
+      Alert.alert(
+        'Discard Note?',
+        'Are you sure you want to discard this note?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Discard', style: 'destructive', onPress: () => router.back() },
+        ]
+      );
+    } else {
+      router.back();
+    }
   };
+
+  if (!userProfile) {
+    return (
+      <ThemedView className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#0F9E99" />
+      </ThemedView>
+    );
+  }
+
 
   return (
     <ThemedView className="flex-1 bg-background">
@@ -148,7 +211,7 @@ export default function ModalScreen() {
           <ThemedText type="title" className="font-bold text-white">
             Create a Note
           </ThemedText>
-          <TouchableOpacity onPress={handleCancel}>
+          <TouchableOpacity onPress={handleCancel} disabled={loading}>
             <AntDesign name="close" size={24} color="white" />
           </TouchableOpacity>
         </View>
@@ -163,12 +226,12 @@ export default function ModalScreen() {
               borderColor: 'white',
             }}
             source={{
-              uri: "https://blog.logrocket.com/wp-content/uploads/2024/01/react-native-navigation-tutorial.png",
+              uri: userProfile?.image || "https://blog.logrocket.com/wp-content/uploads/2024/01/react-native-navigation-tutorial.png",
             }}
           />
           <View className="ml-3">
             <ThemedText className="text-base font-bold text-white">
-              Mom
+              {userProfile?.username || 'User'}
             </ThemedText>
             <ThemedText className="text-sm text-white opacity-90">
               Posting to family
@@ -281,32 +344,65 @@ export default function ModalScreen() {
           </View>
 
           {/* Add Photo Section */}
-          <TouchableOpacity
-            className="flex-row gap-2 justify-center items-center p-4 bg-gray-50 rounded-xl border-2 border-gray-300 border-dashed"
-            onPress={() => {
-              // TODO: Open image picker
-              console.log('Open image picker');
-            }}
-          >
-            <AntDesign name="picture" size={20} color="#0F9E99" />
-            <ThemedText className="text-sm text-text">Add photo or image</ThemedText>
-          </TouchableOpacity>
+          {selectedImageUri ? (
+            <View className="gap-2">
+              <Image
+                source={{ uri: selectedImageUri }}
+                style={{
+                  width: '100%',
+                  height: 200,
+                  borderRadius: 12,
+                }}
+                contentFit="cover"
+              />
+              <TouchableOpacity
+                onPress={handleRemoveImage}
+                className="flex-row gap-2 justify-center items-center p-3 bg-red-50 rounded-xl border border-red-200"
+              >
+                <AntDesign name="delete" size={18} color="#DC2626" />
+                <ThemedText className="text-sm" style={{ color: '#DC2626' }}>
+                  Remove image
+                </ThemedText>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <></>
+            // <TouchableOpacity
+            //   className="flex-row gap-2 justify-center items-center p-4 bg-gray-50 rounded-xl border-2 border-gray-300 border-dashed"
+            //   onPress={handlePickImage}
+            //   disabled={loading}
+            // >
+            //   <AntDesign name="picture" size={20} color="#0F9E99" />
+            //   <ThemedText className="text-sm text-text">Add photo or image</ThemedText>
+            // </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
 
       {/* Share Button with Gradient */}
       <View className="p-5 bg-white border-t border-gray-200">
-        <TouchableOpacity onPress={handleSave}>
+        <TouchableOpacity onPress={handleSave} disabled={loading}>
           <LinearGradient
-            colors={['#0F9E99', '#0A7A76']} // Gradient matching header
+            colors={loading ? ['#999', '#777'] : ['#0F9E99', '#0A7A76']} // Gray when loading
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             className="flex-row gap-2 justify-center items-center p-4 rounded-full"
           >
-            <AntDesign name="right" size={18} color="white" />
-            <ThemedText className="text-base font-semibold text-white">
-              Share with Family
-            </ThemedText>
+            {loading ? (
+              <>
+                <ActivityIndicator size="small" color="white" />
+                <ThemedText className="text-base font-semibold text-white">
+                  Sharing...
+                </ThemedText>
+              </>
+            ) : (
+              <>
+                <AntDesign name="right" size={18} color="white" />
+                <ThemedText className="text-base font-semibold text-white">
+                  Share with Family
+                </ThemedText>
+              </>
+            )}
           </LinearGradient>
         </TouchableOpacity>
       </View>

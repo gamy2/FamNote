@@ -2,13 +2,14 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 
 import { categories } from "@/constants/categories";
+import { DEFAULT_USER_IMAGE } from "@/constants/images";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotes } from "@/hooks/useNotes";
 import { supabase } from "@/services/supabase";
 import type { NoteWithUser } from "@/types/note.types";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { Image } from "expo-image";
-import { router, useFocusEffect } from "expo-router";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, TouchableOpacity, View } from "react-native";
 
@@ -36,20 +37,14 @@ export default function HomeScreen() {
   const { notes, loading: loadingNotes, error, refreshNotes } = useNotes(userProfile?.family_id || null);
   const [refreshing, setRefreshing] = useState(false);
 
+
   const handleRefresh = async () => {
     setRefreshing(true);
     await refreshNotes();
     setRefreshing(false);
   };
 
-  // Refresh notes when screen comes into focus (e.g., after creating a note)
-  useFocusEffect(
-    React.useCallback(() => {
-      if (userProfile?.family_id) {
-        refreshNotes();
-      }
-    }, [userProfile?.family_id, refreshNotes])
-  );
+
 
   // Redirect to onboarding if no family
   useEffect(() => {
@@ -132,9 +127,7 @@ export default function HomeScreen() {
                           borderWidth: 3,
                           borderColor: "#fff",
                         }}
-                        source={{
-                          uri: note.user?.image || "https://blog.logrocket.com/wp-content/uploads/2024/01/react-native-navigation-tutorial.png",
-                        }}
+                        source={note.user?.image ? { uri: note.user.image } : DEFAULT_USER_IMAGE}
                       />
                       <View style={{ maxWidth: 150 }}>
                         <ThemedText 
@@ -267,9 +260,7 @@ const FamNoteHeader = ({ familyId }: { familyId: string | null }) => {
                   borderWidth: 3,
                   borderColor: "#0F9E99",
                 }}
-                source={{
-                  uri: member.image || "https://blog.logrocket.com/wp-content/uploads/2024/01/react-native-navigation-tutorial.png",
-                }}
+                source={member.image ? { uri: member.image } : DEFAULT_USER_IMAGE}
               />
               <ThemedText className="text-xs text-text max-w-[60px]"   numberOfLines={1}
                           ellipsizeMode="tail">{member.username || 'User'}</ThemedText>

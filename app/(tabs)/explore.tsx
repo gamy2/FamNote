@@ -1,112 +1,192 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Collapsible } from '@/components/ui/collapsible';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
+import { categories } from '@/constants/categories';
+import { DEFAULT_USER_IMAGE } from '@/constants/images';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/services/supabase';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Dimensions, ScrollView, View } from 'react-native';
 
-export default function TabTwoScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor="#D0D0D0"
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          Explore
-        </ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
-  );
+interface FamilyMember {
+  id: string;
+  username: string;
+  email: string;
+  image: string | null;
+  noteCount: number;
 }
 
-const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-});
+export default function FamilyScreen() {
+  const { userProfile } = useAuth();
+  const [members, setMembers] = useState<FamilyMember[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFamilyMembers = async () => {
+      if (!userProfile?.family_id) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Fetch family members
+        const { data: membersData, error: membersError } = await supabase
+          .from('user')
+          .select('id, username, email, image')
+          .eq('family_id', userProfile.family_id);
+
+        if (membersError) {
+          console.error('Error fetching members:', membersError);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch note counts for each member
+        const membersWithCounts = await Promise.all(
+          (membersData || []).map(async (member) => {
+            const { count } = await supabase
+              .from('note')
+              .select('id', { count: 'exact', head: true })
+              .eq('user_id', member.id);
+
+            return {
+              ...member,
+              noteCount: count || 0,
+            };
+          })
+        );
+
+        setMembers(membersWithCounts);
+      } catch (error) {
+        console.error('Error fetching family members:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFamilyMembers();
+  }, [userProfile?.family_id]);
+
+  // Get color for member card (cycle through category colors)
+  const getCardColor = (index: number) => {
+    return categories[index % categories.length];
+  };
+
+  if (!userProfile) {
+    return (
+      <ThemedView className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#0F9E99" />
+      </ThemedView>
+    );
+  }
+
+  return (
+    <ThemedView className="flex-1 bg-backgroundV2">
+      {/* Header with Gradient */}
+      <LinearGradient
+        colors={['#0F9E99', '#0A7A76']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        className="pt-12 pb-6"
+      >
+        <View className="px-5">
+          <ThemedText type="title" className="font-bold text-white">
+            Family
+          </ThemedText>
+          <ThemedText className="text-sm text-white opacity-90 mt-1">
+            {members.length} {members.length === 1 ? 'member' : 'members'}
+          </ThemedText>
+        </View>
+      </LinearGradient>
+
+      <ScrollView 
+        className="flex-1 bg-backgroundV2" 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ padding: 16 }}
+      >
+        {loading ? (
+          <View className="flex-1 justify-center items-center py-20">
+            <ActivityIndicator size="large" color="#0F9E99" />
+          </View>
+        ) : members.length === 0 ? (
+          <View className="flex-1 justify-center items-center py-20">
+            <ThemedText type="title" className="mb-2 text-center">
+              No Family Members
+            </ThemedText>
+            <ThemedText className="text-center text-muted">
+              Invite family members to get started!
+            </ThemedText>
+          </View>
+        ) : (
+          <View className="flex-row flex-wrap justify-between">
+            {members.map((member, index) => {
+              const cardColor = getCardColor(index);
+              const screenWidth = Dimensions.get('window').width;
+              const cardWidth = (screenWidth - 48) / 2; // 2 columns with padding
+
+              return (
+                <View
+                  key={member.id}
+                  className="rounded-3xl p-5 mb-4"
+                  style={{
+                    backgroundColor: cardColor.bgColor,
+                    width: cardWidth,
+                  }}
+                >
+                  {/* Avatar */}
+                  <View className="items-center mb-3">
+                    <Image
+                      style={{
+                        width: 80,
+                        height: 80,
+                        borderRadius: 40,
+                        borderWidth: 4,
+                        borderColor: 'white',
+                      }}
+                      source={member.image ? { uri: member.image } : DEFAULT_USER_IMAGE}
+                    />
+                  </View>
+
+                  {/* Username */}
+                  <ThemedText 
+                    className="text-center font-bold text-base mb-1"
+                    style={{ color: cardColor.textColor }}
+                    numberOfLines={1}
+                  >
+                    {member.username}
+                  </ThemedText>
+
+                  {/* Role/Email - first part before @ */}
+                  <ThemedText 
+                    className="text-center text-xs mb-3 opacity-70"
+                    style={{ color: cardColor.textColor }}
+                    numberOfLines={1}
+                  >
+                    {member.email.split('@')[0]}
+                  </ThemedText>
+
+                  {/* Note Count */}
+                  <View 
+                    className="py-2 px-3 rounded-full"
+                    style={{ 
+                      backgroundColor: cardColor.textColor + '20',
+                      alignSelf: 'center',
+                    }}
+                  >
+                    <ThemedText 
+                      className="text-xs font-semibold"
+                      style={{ color: cardColor.textColor }}
+                    >
+                      {member.noteCount} {member.noteCount === 1 ? 'note' : 'notes'}
+                    </ThemedText>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        )}
+      </ScrollView>
+    </ThemedView>
+  );
+}

@@ -16,8 +16,10 @@ import Animated, {
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { categories, emojis } from '@/constants/categories';
+import { DEFAULT_USER_IMAGE } from '@/constants/images';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCreateNote } from '@/hooks/useCreateNote';
+import { useNotes } from '@/hooks/useNotes';
 
 
 // Animated Emoji Button Component
@@ -124,19 +126,19 @@ const AnimatedPickerButton = ({
 export default function ModalScreen() {
   const { user, userProfile } = useAuth();
   const { loading, error, createNoteWithImage, pickImage } = useCreateNote();
-  
+  const {refreshNotes} =  useNotes(userProfile?.family_id || null)
   const [noteText, setNoteText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
 
-  const handlePickImage = async () => {
-    const uri = await pickImage();
-    if (uri) {
-      setSelectedImageUri(uri);
-    }
-  };
+  // const handlePickImage = async () => {
+  //   const uri = await pickImage();
+  //   if (uri) {
+  //     setSelectedImageUri(uri);
+  //   }
+  // };
 
   const handleRemoveImage = () => {
     setSelectedImageUri(null);
@@ -164,10 +166,14 @@ export default function ModalScreen() {
 
     if (success) {
       // Navigate back first to trigger refresh
+      refreshNotes();
+
       router.back();
       // Show success message after navigation
       setTimeout(() => {
+
         Alert.alert('Success', 'Note shared with your family!');
+        
       }, 100);
     } else if (error) {
       Alert.alert('Error', error);
@@ -225,9 +231,7 @@ export default function ModalScreen() {
               borderWidth: 2,
               borderColor: 'white',
             }}
-            source={{
-              uri: userProfile?.image || "https://blog.logrocket.com/wp-content/uploads/2024/01/react-native-navigation-tutorial.png",
-            }}
+            source={userProfile?.image ? { uri: userProfile.image } : DEFAULT_USER_IMAGE}
           />
           <View className="ml-3">
             <ThemedText className="text-base font-bold text-white">

@@ -1,5 +1,7 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { initializeApp } from 'firebase/app';
-import { Auth, getAuth } from 'firebase/auth';
+// @ts-ignore - getReactNativePersistence exists but may not be in type definitions
+import { Auth, getReactNativePersistence, initializeAuth } from 'firebase/auth';
 
 /**
  * Firebase Configuration
@@ -58,20 +60,18 @@ validateFirebaseConfig();
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
 
-// Initialize Auth
-// Note: Firebase v12.6.0 shows a warning about AsyncStorage persistence.
-// The warning suggests using initializeAuth with getReactNativePersistence,
-// but that function may not be available in this version.
-// Auth will still work, but session persistence between app restarts may be limited.
-// For production, consider updating Firebase or implementing custom session management.
+// Initialize Auth with AsyncStorage persistence for React Native
+// This ensures auth state persists between app sessions
 let auth: Auth;
 
 try {
-  auth = getAuth(firebaseApp);
+  auth = initializeAuth(firebaseApp, {
+    persistence: getReactNativePersistence(AsyncStorage)
+  });
   
   console.log('✅ Firebase initialized successfully');
   console.log('📱 Project ID:', firebaseConfig.projectId);
-  console.log('⚠️  Note: Auth persistence warning may appear - this is expected with Firebase v12.6.0');
+  console.log('✅ Auth persistence configured with AsyncStorage');
 } catch (error) {
   console.error('❌ Firebase initialization error:', error);
   throw error;

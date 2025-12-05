@@ -1,7 +1,5 @@
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { NotesProvider } from "@/contexts/NotesContext";
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { useFonts } from 'expo-font';
 import { Stack } from "expo-router";
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from "expo-status-bar";
@@ -27,10 +25,6 @@ export const unstable_settings = {
 function RootLayoutNav() {
   const { loading: authLoading } = useAuth();
   const [appIsReady, setAppIsReady] = useState(false);
-  const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    ...FontAwesome.font,
-  });
 
   useEffect(() => {
     async function prepare() {
@@ -49,12 +43,12 @@ function RootLayoutNav() {
   }, []);
 
   useEffect(() => {
-    if (appIsReady && !authLoading && (loaded || error)) {
+    if (appIsReady && !authLoading) {
       SplashScreen.hideAsync();
     }
-  }, [appIsReady, authLoading, loaded, error]);
+  }, [appIsReady, authLoading]);
 
-  if (!appIsReady || authLoading || (!loaded && !error)) {
+  if (!appIsReady || authLoading) {
     return null;
   }
 

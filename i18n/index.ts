@@ -16,10 +16,10 @@ import translationEn from "./translations/en.json";
 
     const initI18n = async () => {
       let savedLanguage = await AsyncStorage.getItem("language");
-      const deviceLocale = Localization.locale;
-      const initialLanguage = savedLanguage || (resources[deviceLocale as keyof typeof resources] ? deviceLocale : "en-US");
+      const deviceLocale = Localization.getLocales()[0]?.languageTag;
+      const initialLanguage = savedLanguage || (deviceLocale && resources[deviceLocale as keyof typeof resources] ? deviceLocale : "en-US");
 
-      i18n
+      await i18n
         .use(initReactI18next)
         .init({
           resources,
@@ -31,7 +31,6 @@ import translationEn from "./translations/en.json";
         });
     };
 
-
-    initI18n();
+    export const i18nLoaded = initI18n();
 
     export default i18n;

@@ -1,11 +1,18 @@
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { NotesProvider } from "@/contexts/NotesContext";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useFonts } from 'expo-font';
 import { Stack } from "expo-router";
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
 import { LogBox } from "react-native";
 import "react-native-reanimated";
 import "../global.css";
-import "../i18n";
+import { i18nLoaded } from "../i18n";
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
 // Suppress SafeAreaView deprecation warning from third-party libraries (react-native-paper)
 // The library will update in future versions to use react-native-safe-area-context
@@ -13,28 +20,64 @@ LogBox.ignoreLogs([
   'SafeAreaView has been deprecated',
 ]);
 
-
-
 export const unstable_settings = {
   anchor: "(tabs)",
 };
 
-export default function RootLayout() {
+function RootLayoutNav() {
+  const { loading: authLoading } = useAuth();
+  const [appIsReady, setAppIsReady] = useState(false);
+  const [loaded, error] = useFonts({
+    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    ...FontAwesome.font,
+  });
+
+  useEffect(() => {
+    async function prepare() {
+      try {
+        // Wait for i18n to initialize
+        await i18nLoaded;
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        // Tell the application to render
+        setAppIsReady(true);
+      }
+    }
+
+    prepare();
+  }, []);
+
+  useEffect(() => {
+    if (appIsReady && !authLoading && (loaded || error)) {
+      SplashScreen.hideAsync();
+    }
+  }, [appIsReady, authLoading, loaded, error]);
+
+  if (!appIsReady || authLoading || (!loaded && !error)) {
+    return null;
+  }
 
   return (
+    <NotesProvider>
+      <Stack>
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="modal"
+          options={{ presentation: "modal", headerShown :false }}
+        />
+      </Stack>
+      <StatusBar style="dark" />
+    </NotesProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
     <AuthProvider>
-      <NotesProvider>
-        <Stack>
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="modal"
-            options={{ presentation: "modal", headerShown :false }}
-          />
-        </Stack>
-        <StatusBar style="dark" />
-      </NotesProvider>
+      <RootLayoutNav />
     </AuthProvider>
   );
 }

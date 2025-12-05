@@ -4,7 +4,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
-import { LogBox } from "react-native";
+import { ActivityIndicator, LogBox, View } from "react-native";
 import "react-native-reanimated";
 import "../global.css";
 import { i18nLoaded } from "../i18n";
@@ -29,10 +29,11 @@ function RootLayoutNav() {
   useEffect(() => {
     async function prepare() {
       try {
-        // Wait for i18n to initialize
-        await i18nLoaded;
+        // Wait for i18n to initialize with a timeout
+        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('i18n timeout')), 4000));
+        await Promise.race([i18nLoaded, timeout]);
       } catch (e) {
-        console.warn(e);
+        console.warn('Initialization error or timeout:', e);
       } finally {
         // Tell the application to render
         setAppIsReady(true);
@@ -43,13 +44,21 @@ function RootLayoutNav() {
   }, []);
 
   useEffect(() => {
-    if (appIsReady && !authLoading) {
+    if (appIsReady) {
       SplashScreen.hideAsync();
     }
-  }, [appIsReady, authLoading]);
+  }, [appIsReady]);
 
-  if (!appIsReady || authLoading) {
+  if (!appIsReady) {
     return null;
+  }
+
+  if (authLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff' }}>
+        <ActivityIndicator size="large" color="#0F9E99" />
+      </View>
+    );
   }
 
   return (
